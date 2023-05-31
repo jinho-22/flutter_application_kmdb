@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_kmdb/Movie_form.dart';
 import 'package:flutter_application_kmdb/movie_api.dart';
 
 class MainPage extends StatefulWidget {
@@ -12,10 +13,36 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   var controller = TextEditingController();
+  dynamic body = const Center(child: Text('검색전'));
 
-  void searchMovie(String keyword) {
+  void searchMovie(String keyword) async {
     MovieApi movieApi = MovieApi();
-    movieApi.search(keyword);
+    var movies = movieApi.search(keyword);
+    setState(() {
+      body = FutureBuilder(
+        future: movies,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            var movieDdata = snapshot.data;
+            return ListView.separated(
+                itemBuilder: (context, index) {
+                  return MovieForm(movie: movieDdata[index]);
+                },
+                separatorBuilder: (context, index) => const Divider(),
+                itemCount: movieDdata!.length);
+          } else {
+            return const Center(child: CircularProgressIndicator());
+          }
+        },
+      );
+
+      // body = ListView.separated(
+      //     itemBuilder: (context, index) {
+      //       return MovieForm(movie: movies[index]);
+      //     },
+      //     separatorBuilder: (context, index) => const Divider(),
+      //     itemCount: movies.length);
+    });
   }
 
   void showSearchPage() async {
@@ -50,13 +77,12 @@ class _MainPageState extends State<MainPage> {
                 ],
               ),
             ));
-    print(result);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: null,
+      body: body,
       floatingActionButton: FloatingActionButton(
         onPressed: showSearchPage,
         child: const Icon(Icons.search),
