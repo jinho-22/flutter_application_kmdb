@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:readmore/readmore.dart';
 import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MovieDetail extends StatelessWidget {
   Map<String, dynamic> movie;
@@ -16,6 +17,20 @@ class MovieDetail extends StatelessWidget {
         ? Image.asset('asset/images/no-image.jpg')
         : Image.network(movie['posters'].toString().split('|')[0]);
     // var stills = movie['stlls'].toString().split('|');
+    List<Widget> stills = [];
+    if (movie['stlls'].toString().isEmpty) {
+      stills.add(Image.asset(
+        'asset/images/no-image.jpg',
+        fit: BoxFit.fitHeight,
+      ));
+    } else {
+      for (var k in movie['stlls'].toString().split('|')) {
+        stills.add(Image.network(
+          k,
+          fit: BoxFit.fitHeight,
+        ));
+      }
+    }
 
     return Scaffold(
       appBar: AppBar(title: Text('영화상세 정보($movieTitle)')),
@@ -43,7 +58,16 @@ class MovieDetail extends StatelessWidget {
                   fontSize: 14, fontWeight: FontWeight.bold, color: Colors.red),
             ),
             ImageSlideshow(
-                children: [for (var src in stills) Image.network(src)])
+                autoPlayInterval: 3000,
+                isLoop: true,
+                width: double.infinity,
+                height: 200,
+                children: stills),
+            ElevatedButton(
+                onPressed: () {
+                  launchUrl(Uri.parse(movie['kmdbUrl'].toString()));
+                },
+                child: const Text('사이트 연결'))
           ],
         ),
       ),

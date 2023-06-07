@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'Main_Page.dart';
+import 'main_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,6 +16,8 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: ('영화 검색'),
       home: MainPage(),
     );
   }
